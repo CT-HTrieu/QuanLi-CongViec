@@ -1,0 +1,21 @@
+.panel-heading{
+    display: flex;
+    background-color: rgb(245, 208, 208);
+    justify-content: space-between;
+}
+.exit_icon {
+    font-size: 1.1rem;
+    margin: auto 0;
+    margin-right: 4px;
+    cursor: pointer;
+}
+.label-danger{
+    background-color:green;
+    color:white;
+    cursor: pointer;
+}
+.label-success{
+    background-color: red;
+    color: white;
+    cursor: pointer ;
+}
