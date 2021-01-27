@@ -1,5 +1,7 @@
 import React ,{Component} from "react"
 import './Search.css';
+import { connect } from 'react-redux';
+import * as actions from './../Actions/index';
 class Seacrch extends Component {
     constructor(props){
         super(props)
@@ -44,4 +46,21 @@ class Seacrch extends Component {
         );
     }
 }
-export default Seacrch;
+
+
+const mapStateToProps =(state)=>{
+    return {
+    }
+}
+
+const mapDispatchToProps = (dispatch, props)=>{
+
+    return {
+        onSearch:(keyWord)=>{
+            dispatch(actions.searchTask(keyWord));
+        }
+    };
+
+}
+export default connect(mapStateToProps,mapDispatchToProps) (Seacrch);
+

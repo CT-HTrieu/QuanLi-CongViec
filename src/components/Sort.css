@@ -1,20 +1,3 @@
-.dropdown-menu .divider {
-    height: 1px;
-    margin: 9px 0;
-    overflow: hidden;
-    background-color: #e5e5e5;
-}
-
-.sort_selected::after {
-    content: '\F00C';
-    box-sizing: border-box;
-    font-family:unset;
-    font-weight: normal;
-    font-style: normal;
-    margin: 0px 0px 0px 10px;
-    display: inline-block;
-}
-.sort_selected{
-    color: red;
-    text-decoration: none;
+.fas{
+    padding-left: 8px;
 }

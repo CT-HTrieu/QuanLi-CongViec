@@ -5,106 +5,29 @@ import Control from "./Control";
 import List from "./List";
 import TaksForm from "./taksForm";
 import "./App.css";
+import { connect } from 'react-redux';
+import * as actions from './../Actions/index';
 class App extends Component {
-    constructor(props){
-        super(props);
-        this.state={
-            tasks : [],
-            isDisplayForm : false,
-            taskEditing:null,
-            filter:{
-                name:"",
-                status:-1
-            },
-            keyWord:"",
-            sortBy:'name',
-            sortValue:1
-        }
-    }
-    componentDidMount()
-    {
-     if(localStorage && localStorage.getItem('tasks'))
-     {
-         var tasks = JSON.parse(localStorage.getItem('tasks'));
-         this.setState({
-            tasks: tasks
-         });
-     }   
-    }
-  /////////////  xóa hết id 
-    DeteleID= ()=>{
-        var {tasks} = this.state;
-        for(var i=0;i<tasks.length;i++){
-            tasks[i].id = this.generateID();
-        }
-        this.setState({
-            tasks:tasks
-        })
-         localStorage.setItem("tasks",JSON.stringify(tasks));
-    }
-    s4(){
-         return Math.floor((1+Math.random()) * 0x10000).toString(16).substring(1);
-    }
-    generateID(){
-         var s = this.s4()+this.s4()+'-'+this.s4()+this.s4()+'-'+this.s4()+this.s4()+'-'+this.s4()+this.s4();
-        return s;
-    }
-    onTogoForm = ()=>{
-        this.setState({
-            isDisplayForm: !this.state.isDisplayForm,
-            taskEditing:null
-        });
-    }
-    onCloseForm = () =>{
-         this.setState({
-            isDisplayForm: false
-        });
-    }
-    onSubmit = (data)=>{
-        var {tasks} = this.state;
-        if(data.id ==="")
+    onToggleForm = ()=>{
+        var {itemEditting} = this.props;
+        if(itemEditting && itemEditting.id !=="")
         {
-            data.id = this.generateID();
-            tasks.push(data);
+            this.props.onClearTask({
+                id:'',
+                name:'',
+                status:false
+                 });
         }
         else{
-            var index = this.findIndex(data.id);
-            tasks[index] = data;
-        }
-        this.setState({
-            tasks:tasks,
-            taskEditing:null
-    
-        });
-        localStorage.setItem("tasks",JSON.stringify(tasks));
-    }
-    onUpdateStatus = (id)=>{
-        var {tasks} = this.state;
-        var index = this.findIndex(id);
-        // eslint-disable-next-line eqeqeq
-        if(index !==-1 ){
-            tasks[index].status = !tasks[index].status 
-        }
-        this.setState({
-            tasks:tasks
-        });
-          localStorage.setItem("tasks",JSON.stringify(tasks));
-    }
-     onDelete = (id)=>{
-        var {tasks} = this.state;
-        var index = this.findIndex(id);
-        // eslint-disable-next-line eqeqeq
-        if(index !== -1 ){
-            tasks.splice(index,1);
-            console.log(index);
-            this.setState({
-            tasks:tasks
-        });
-          localStorage.setItem("tasks",JSON.stringify(tasks));
-        }
-        this.onCloseForm();
-    }
-   
+            this.props.onToggleForm();
+            this.props.onClearTask({
+                id:'',
+                name:'',
+                status:false
+                 });
+        }   
+     }
+
     findIndex = (id)=>{
         var {tasks} = this.state;
         var result = -1;
@@ -115,76 +38,10 @@ class App extends Component {
         });
        return result; 
     }
-    onUpdate = (id)=>{
-          var {tasks} = this.state;
-          var index = this.findIndex(id);
-          var taskE = tasks[index];
-          this.setState({
-                taskEditing:taskE
-                 });
-        this.onShowForm();
-        
-    }
-    onShowForm=()=>{
-         this.setState({
-            isDisplayForm: true
-        });
-    }
-    onFiter = (fiterName,fiterStatus)=>{
-        fiterStatus = parseInt(fiterStatus,10);
-        this.setState({
-            filter:{
-                name:fiterName.toLowerCase(),
-                status:fiterStatus
-            }
-        })
-    }
-    onSearch = (keyWord)=>{
-        this.setState({
-            keyWord : keyWord
-        })
-    }
-
-    onSort = (name, value)=>{
-    this.setState({
-        sortBy:name,
-        sortValue:value
-    })
-    }
 render(){
-    var {tasks,isDisplayForm,taskEditing, filter,keyWord,sortValue,sortBy} = this.state;
-    if(filter){
-        if(filter.name){
-            tasks = tasks.filter((task)=>{
-                return task.name.toLowerCase().indexOf(filter.name) !==-1;
-            });
-        }
-            tasks= tasks.filter((task)=>{
-                if(filter.status === -1 )
-                    return task;
-                else{
-                    return task.status === (filter.status=== 1 ? true : false)
-                }    
-            });
-    }
-    if(keyWord){
-        tasks = tasks.filter((task)=>{
-        return task.name.toLowerCase().indexOf(keyWord) !==-1;
-            });
-    }
-    if(sortBy==='name'){
-        tasks.sort((a,b)=>{
-            if(a.name > b.name) return sortValue;
-            else if(a.name < b.name) return -sortValue;
-            else return 0;
-    })
-    }else{
-        tasks.sort((a,b)=>{
-            if(a.status > b.status) return -sortValue;
-            else if(a.status < b.status) return sortValue;
-            else return 0;
-    })
-    }
+    var {isDisplayForm} = this.props;
+   
+    
     return(
         <div className="container">
         <div className="text-center">
@@ -194,39 +51,22 @@ render(){
         <div className="row">
             <div className={isDisplayForm ? "col-xs-4 col-sm-4 col-md-4 col-lg-4":""}>
             {/*taksFrom */}
-            {/* kt tasks form theo tru false  */}
-            {isDisplayForm ? 
-            <TaksForm 
-            onCloseForm={this.onCloseForm}
-            onSubmit = {this.onSubmit} 
-            task = {taskEditing}  
-            />: ""}
+            <TaksForm />
             
         </div>        
             <div className={isDisplayForm ? "col-xs-8 col-sm-8 col-md-8 col-lg-8" :"col-xs-12 col-sm-12 col-md-12 col-lg-12"}>
                 <button type="button" 
-                        onClick = {this.onTogoForm}
+                        onClick = {this.onToggleForm}
                         className="btn btn-primary insert_job">
                         <span className="fa fa-plus mr-2"></span>
                         Thêm Công Việc 
                 </button>
                 {/*search - sort  */}
-                    <Control
-                    onSearch = {this.onSearch}
-                    onSort= {this.onSort}
-                    sortBy = {sortBy}
-                    sortValue={sortValue}
-                    />
+                    <Control/>
                     {/*Sort */}
                 <div className="row mt-15">
                     <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                      <List 
-                      tasks ={tasks} 
-                      onUpdateStatus={this.onUpdateStatus} 
-                      onDelete={this.onDelete}
-                      onUpdate= {this.onUpdate}   
-                      onFiter = {this.onFiter} 
-                      />                    
+                      <List />                    
                     </div>
                 </div>
             </div>
@@ -236,5 +76,29 @@ render(){
 }
 }
 
-export default App;
+const mapStateToProps =(state)=>{
+    return {
+        isDisplayForm: state.isDisplayForm,
+        itemEditting: state.itemEditting
+    }
+}
+
+const mapDispatchToProps = (dispatch, props)=>{
+
+    return {
+        onToggleForm : ()=>{
+            dispatch(actions.toggleForm());
+        },
+         onClearTask : (task)=>{
+          dispatch(actions.editTask(task));
+        },onCloseForm :()=>{ 
+            dispatch(actions.closeForm()); 
+        },
+        onOpenForm: () =>{
+            dispatch(actions.openForm());
+        }
+    };
+
+}
+export default connect(mapStateToProps,mapDispatchToProps) (App);
 

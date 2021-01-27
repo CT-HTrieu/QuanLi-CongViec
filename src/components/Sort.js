@@ -1,27 +1,18 @@
 import React ,{Component} from "react"
 import './Sort.css';
+import { connect } from 'react-redux';
+import * as actions from './../Actions/index';
 class Sort extends Component {
-    constructor(params) {
-        super(params)
-        this.state={
-            sort:{
-                by: 'name',
-                value:1
-            }
-        }
-    }
-    
     onClick = (sortBy,sortValue)=>{
-        this.setState({
-            sort:{
+           var sort ={
                 by:sortBy,
                 value:sortValue
             }
-        });
-        this.props.onSort(this.state.sort.by,this.state.sort.value);
+     this.props.onSort(sort);
     }
     render(){
-        var {sort} = this.state;
+        var {sort} = this.props;
+        console.log(sort);
         return(
             <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                         <div className="dropdown">
@@ -32,52 +23,60 @@ class Sort extends Component {
                             data-toggle="dropdown" 
                             aria-haspopup="true" 
                             aria-expanded="true">
-                                Sắp Xếp
-                            <span className="fa fa-caret-square-o-down"></span>    
+                            Sắp Xếp     
+                            <span className="fas fa-caret-square-down"></span>    
                             </button>
                             <ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
                                 <li onClick={()=>this.onClick('name',1)} >
                                     <a href="./#" role="button" 
-                                    className={(sort.by==='name' && sort.value===1)
-                                    ? "sort_selected":""
-                                     }>
-                                                <span className="fas fa-sort-alpha-up pr-2">
-                                                     
-                                                </span>
-                                            Tên A-Z                 
-                                            </a>
+                                    ><span className="fas fa-sort-alpha-up pr-2"></span>
+                                        Tên A-Z  
+                                     <i className={(sort.by==='name' && sort.value===1)? "fas fa-check":""}></i>                  
+                                    </a>
                                 </li>
                                 <li onClick={()=>this.onClick('name',-1)}>
                                     <a href="./#"
                                     role="button"
-                                    className={(sort.by==='name' && sort.value===-1)
-                                    ? "sort_selected":""
-                                     }
-                                    >
-                                                <span className="fas fa-sort-alpha-up-alt pr-2">
-                                                   </span>
-                                                Tên Z-A
-    
-                                            </a>
+                                    ><span className="fas fa-sort-alpha-up-alt pr-2"></span>
+                                        Tên Z-A
+                                        <i className={(sort.by==='name' && sort.value===-1)? "fas fa-check":""}></i>
+                                    </a>
                                 </li>
                                 <li role="separator" className="divider"></li>
                                 <li onClick={()=>this.onClick('status',1)}>
                                     <a href="./#" 
                                     role="button"
-                                        className={(sort.by==='status' && sort.value===1)
-                                    ? "sort_selected":""
-                                     }
-                                >Trạng Thái Kích Hoạt</a></li>
+                                >Trạng Thái Kích Hoạt
+                                <i className={(sort.by==='status' && sort.value===1)? "fas fa-check":""}></i>
+                                </a></li>
                                 <li onClick={()=>this.onClick('status',-1)}><a 
                                 href="./#"
                                 role="button"
-                                className={(sort.by==='status' && sort.value===-1)
-                                    ? "sort_selected":""
-                                     }
-                                >Trạng Thái Ẩn</a></li>
+                                >Trạng Thái Ẩn
+                                <i className={(sort.by==='status' && sort.value=== -1)? "fas fa-check":""}></i>
+                                </a></li>
                             </ul>
                         </div>
-             </div>      );
+             </div>      
+            );
     }
 }
-export default Sort;
+
+
+
+const mapStateToProps =(state)=>{
+    return {
+        sort:state.sort
+    }
+}
+
+const mapDispatchToProps = (dispatch, props)=>{
+
+    return {
+        onSort:(sort)=>{
+            dispatch(actions.sortTask(sort));
+        }
+    };
+
+}
+export default connect(mapStateToProps,mapDispatchToProps) (Sort);

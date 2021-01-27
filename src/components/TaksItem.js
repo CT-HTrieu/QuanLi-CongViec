@@ -1,14 +1,18 @@
 import React, {Component} from "react"
-
+import { connect } from "react-redux";
+import * as actions from './../Actions/index';
  class TaksItem extends Component{
      onUpdateStatus = () =>{
          this.props.onUpdateStatus(this.props.task.id);
      }
      onDelete =()=>{
          this.props.onDelete(this.props.task.id);
+         this.props.onCloseForm();
      }
-     onUpdate =()=>{
-         this.props.onUpdate(this.props.task.id);
+     onEditTask=()=>{
+            this.props.onEditTask(this.props.task); 
+            this.props.onOpenForm();    
+            
      }
      render(){
          var {task,index} = this.props;
@@ -27,7 +31,7 @@ import React, {Component} from "react"
                                     <td className="text-center">
                                         <button type="button" 
                                         className="btn btn-warning"
-                                        onClick={this.onUpdate}>
+                                        onClick={this.onEditTask}>
                                             <span className="fas fa-pencil-alt mr-2"></span>
                                             Sửa
                                         </button>
@@ -45,4 +49,30 @@ import React, {Component} from "react"
          );
      }
  }
- export default TaksItem;
+ const mapStateToProps =(state)=>{
+    return{};
+}
+
+const mapDispatchToProps = (dispatch, props)=>{
+
+    return {
+        onUpdateStatus : (id)=>{
+            dispatch(actions.updateStatusTask(id));
+        },
+        onDelete :(id)=> {
+            dispatch(actions.deleteTask(id));
+        },
+        onCloseForm :()=>{ 
+            dispatch(actions.closeForm());
+        },
+        onOpenForm: () =>{
+            dispatch(actions.openForm());
+        },
+        onEditTask: (task)=>{
+            dispatch(actions.editTask(task));
+        }
+    };
+
+}
+export default connect(mapStateToProps,mapDispatchToProps) (TaksItem);
+

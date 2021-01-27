@@ -1,5 +1,7 @@
 import React, {Component} from 'react'
 import TasksItem from "./TaksItem"
+import { connect } from "react-redux";
+import * as actions from './../Actions/index';
  class List extends Component{
      constructor(props){
          super(props)
@@ -12,23 +14,59 @@ import TasksItem from "./TaksItem"
         var target = event.target;
         var name = target.name;
         var value = target.value;
-        this.props.onFiter(name==="fiterName" ? value : this.state.fiterName,
-                            name==="fiterStatus" ? value: this.state.fiterStatus);
+        var filter={
+            name:name==="fiterName" ? value : this.state.fiterName,
+            status:name==="fiterStatus" ? value: this.state.fiterStatus
+        }
+         this.props.onFilterTable(filter);
           this.setState({
               [name]: value
           })
     } 
      render(){
-         var {tasks} = this.props;
+         var {tasks,filterTable,keyWord,sort} = this.props;
          var {fiterName,fiterStatus} = this.state;
+            if(filterTable.name){
+              tasks = tasks.filter((task)=>{
+                   return task.name.toLowerCase().indexOf(filterTable.name) !==-1;
+                 });
+             }
+                tasks= tasks.filter((task)=>{   
+                if(filterTable.status === -1 )
+                    return task;
+                else{
+                    return task.status === (filterTable.status === "1" ? true : false)
+                }    
+            });
+
+         //search
+        if(keyWord){
+        tasks = tasks.filter((task)=>{
+        return task.name.toLowerCase().indexOf(keyWord) !==-1;
+            });
+        }   
+
+        //sort
+            if(sort.by==='name'){
+                tasks.sort((a,b)=>{
+                  if(a.name > b.name) return sort.value;
+                     else if(a.name < b.name) return -sort.value;
+                     else return 0;
+                })
+            }else{
+                 tasks.sort((a,b)=>{
+                   if(a.status > b.status) return -sort.value;
+                    else if(a.status < b.status) return sort.value;
+                        else return 0;
+                    })
+                 }
+
+        //
          var elTask = tasks.map((task,index) => {
             return <TasksItem 
             key={task.id} 
-            index={index} 
-            task = {task}
-            onUpdateStatus={this.props.onUpdateStatus}   
-            onDelete={this.props.onDelete} 
-            onUpdate = {this.props.onUpdate}
+            index={index } 
+            task = {task} 
             />
          });
          return(
@@ -71,4 +109,22 @@ import TasksItem from "./TaksItem"
          );
      }
  }
- export default List;
+const mapStateToProps = (state)=>{
+    return {
+        tasks: state.tasks,
+        filterTable: state.filterTable,
+        keyWord:state.search,
+        sort: state.sort
+    };
+
+};
+
+const mapDispatchToProps =(dispatch,props)=>{
+    return{
+            onFilterTable:(filter)=>{
+                dispatch(actions.filterTask(filter));
+            }
+    }
+}
+
+ export default connect(mapStateToProps,mapDispatchToProps) (List);
